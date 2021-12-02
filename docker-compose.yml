@@ -1,0 +1,32 @@
+version: '3.7'
+
+services:
+  notion:
+    restart: always
+    image: outlinewiki/outline:${SERVICE_NOTION_VERSION}
+    # ports:
+    #   - 0.0.0.0:3000:3000
+    env_file:
+      - ${SERVICE_NOTION_CONFIG_ENV}
+    environment:
+      VERSION: ${SERVICE_NOTION_VERSION}
+      URL: https://${SERVICE_NOTION_DOMAIN}
+      DATABASE_URL: postgres://${SERVICE_NOTION_DATABASE_USERNAME}:${SERVICE_NOTION_DATABASE_PASSWORD}@postgres:5432/${SERVICE_NOTION_DATABASE_NAME}
+      REDIS_URL: redis://:${SERVICE_NOTION_REDIS_SECRET}@redis:6379
+      SECRET_KEY: ${SERVICE_NOTION_SECRET_KEY}
+    # volumes:
+    #   # - $CONFIG:/conf
+    #   - $DATA/outline:/opt/outline
+
+  notion-storage:
+    restart: always
+    image: lphoward/fake-s3
+    # ports:
+    #   - 4569:4569
+    volumes:
+      - ${SERVICE_DATA}/fakes3:/fakes3_root
+
+networks:
+  default:
+    external: true
+    name: compose-ingress

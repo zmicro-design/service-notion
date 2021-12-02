@@ -1,0 +1,66 @@
+#!/bin/bash
+
+load inquirer
+
+check() {
+  if [ ! -f $SERVICE_CONFIG ]; then
+     touch $SERVICE_CONFIG
+  fi
+  config::load_file $SERVICE_CONFIG
+
+  if [ ! -f "$SERVICE_NOTION_CONFIG_ENV" ]; then
+    cp $SERVICE_DIR/conf/env.example $SERVICE_NOTION_CONFIG_ENV
+  fi
+
+  if [ -z "$SERVICE_NOTION_DOMAIN" ]; then
+    inquirer::text "请输入 SERVICE_NOTION_DOMAIN:" value
+    config::set SERVICE_NOTION_DOMAIN $value $SERVICE_CONFIG
+  fi
+
+  if [ -z "$SERVICE_NOTION_DATABASE_USERNAME" ]; then
+    inquirer::text "请输入 SERVICE_NOTION_DATABASE_USERNAME:" value
+    config::set SERVICE_NOTION_DATABASE_USERNAME $value $SERVICE_CONFIG
+  fi
+
+  if [ -z "$SERVICE_NOTION_DATABASE_PASSWORD" ]; then
+    inquirer::text "请输入 SERVICE_NOTION_DATABASE_PASSWORD:" value
+    config::set SERVICE_NOTION_DATABASE_PASSWORD $value $SERVICE_CONFIG
+  fi
+
+  if [ -z "$SERVICE_NOTION_DATABASE_NAME" ]; then
+    inquirer::text "请输入 SERVICE_NOTION_DATABASE_NAME:" value
+    config::set SERVICE_NOTION_DATABASE_NAME $value $SERVICE_CONFIG
+  fi
+
+  if [ -z "$SERVICE_NOTION_REDIS_SECRET" ]; then
+    inquirer::text "请输入 SERVICE_NOTION_REDIS_SECRET:" value
+    config::set SERVICE_NOTION_REDIS_SECRET $value $SERVICE_CONFIG
+  fi
+
+  if [ -z "$SERVICE_NOTION_SECRET_KEY" ]; then
+    inquirer::text "请输入 SERVICE_NOTION_SECRET_KEY:" value "$(os::random_id)"
+    config::set SERVICE_NOTION_SECRET_KEY $value $SERVICE_CONFIG
+  fi
+
+  if [ -z "$SERVICE_NOTION_UTILS_SECRET" ]; then
+    inquirer::text "请输入 SERVICE_NOTION_UTILS_SECRET:" value "$(os::random_id)"
+    config::set SERVICE_NOTION_UTILS_SECRET $value $SERVICE_CONFIG
+  fi
+  
+  # load again
+  config::load_file $SERVICE_CONFIG
+  
+  # @TODO
+  export SERVICE_NOTION_DOMAIN=$SERVICE_NOTION_DOMAIN
+
+  export SERVICE_NOTION_DATABASE_USERNAME=$SERVICE_NOTION_DATABASE_USERNAME
+  export SERVICE_NOTION_DATABASE_PASSWORD=$SERVICE_NOTION_DATABASE_PASSWORD
+  export SERVICE_NOTION_DATABASE_NAME=$SERVICE_NOTION_DATABASE_NAME
+
+  export SERVICE_NOTION_REDIS_SECRET=$SERVICE_NOTION_REDIS_SECRET
+
+  export SERVICE_NOTION_SECRET_KEY=$SERVICE_NOTION_SECRET_KEY
+  export SERVICE_NOTION_UTILS_SECRET=$SERVICE_NOTION_UTILS_SECRET
+}
+
+check $@
